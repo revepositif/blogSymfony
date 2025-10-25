@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if user.avatar %}
+                        <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="Avatar" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <i class="bi bi-person-fill text-white" style="font-size: 4rem;"></i>
+                        </div>
+                    {% endif %}
+                    <h5 class="card-title">{{ user.prenom }} {{ user.nom }}</h5>
+                    <p class="text-muted">Membre depuis {{ user.dateCreation|date('d/m/Y') }}</p>
+                    <a href="{{ path('app_profile_edit') }}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i> Modifier mon profil
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Informations</h5>
+                    <hr>
+                    <dl class="row">
+                        <dt class="col-sm-3">Email</dt>
+                        <dd class="col-sm-9">{{ user.email }}</dd>
+                        
+                        <dt class="col-sm-3">Prénom</dt>
+                        <dd class="col-sm-9">{{ user.prenom }}</dd>
+                        
+                        <dt class="col-sm-3">Nom</dt>
+                        <dd class="col-sm-9">{{ user.nom }}</dd>
+                        
+                        <dt class="col-sm-3">Biographie</dt>
+                        <dd class="col-sm-9">
+                            {% if user.biographie %}
+                                {{ user.biographie|nl2br }}
+                            {% else %}
+                                <em class="text-muted">Aucune biographie</em>
+                            {% endif %}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Statistiques</h5>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h3>{{ user.articles|length }}</h3>
+                            <p class="text-muted">Articles</p>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ user.comments|length }}</h3>
+                            <p class="text-muted">Commentaires</p>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ user.likes|length }}</h3>
+                            <p class="text-muted">J'aime</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
