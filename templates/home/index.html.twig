@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Bienvenu sur - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="bg-light p-5 rounded mb-4">
+                <h1 class="display-4">{{ title }}</h1>
+                <p class="lead">Découvrez les derniers articles, partagez vos connaissances et échangez avec la communauté.</p>
+                <hr class="my-4">
+                <p>Rejoignez-nous dès maintenant pour participer à cette aventure.</p>
+                <a class="btn btn-primary btn-lg" href="#" role="button">
+                    <i class="bi bi-person-plus"></i> S'inscrire
+                </a>
+            </div>
+
+            <h2 class="mb-4">Derniers articles</h2>
+            <div class="row g-4">
+                {# Les articles seront ajoutés ici une fois que l'entité Article sera configurée #}
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Les articles apparaîtront ici</h5>
+                            <p class="card-text text-muted">Une fois que l'entité Article sera configurée, nous afficherons les derniers articles publiés à cet endroit.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-search"></i> Rechercher
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form action="#" method="get">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Rechercher un article...">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-tags"></i> Catégories
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Les catégories apparaîtront ici une fois l'entité Category configurée.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-star"></i> Articles populaires
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Les articles les plus consultés apparaîtront ici.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
