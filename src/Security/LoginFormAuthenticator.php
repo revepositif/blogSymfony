@@ -37,7 +37,21 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
         return new Passport(
-            new UserBadge($email),
+            new UserBadge($email, function($userIdentifier) {
+                $user = $this->userRepository->findOneBy(['email' => $userIdentifier]);
+                
+                if (!$user) {
+                    throw new UserNotFoundException();
+                }
+
+                if (!$user->isEstVerifie()) {
+                    throw new CustomUserMessageAuthenticationException(
+                        'Veuillez confirmer votre compte en cliquant sur le lien envoyé par email avant de vous connecter.'
+                    );
+                }
+
+                return $user;
+            }),
             new PasswordCredentials($request->request->get('password', '')),
             [
                 new CsrfTokenBadge('authenticate', $request->request->get('_csrf_token')),
