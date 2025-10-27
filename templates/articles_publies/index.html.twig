@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Articles publiés{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4">Articles publiés</h1>
+
+    <div class="row g-4">
+        {% for article in articles %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    {% if article.image %}
+                        <img src="{{ asset('uploads/articles/' ~ article.image) }}" class="card-img-top" alt="Image de l'article" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ article.titre }}</h5>
+                        <p class="card-text">{{ article.contenu|striptags|slice(0, 150) }}...</p>
+                        <div class="text-muted small mb-2">
+                            <i class="fas fa-user me-1"></i> {{ article.auteur }}
+                            <i class="fas fa-calendar ms-2 me-1"></i> {{ article.datePublication|date('d/m/Y') }}
+                        </div>
+                        {% if article.category %}
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-1">{{ article.category.nom }}</span>
+                            </div>
+                        {% endif %}
+                        <a href="{{ path('app_article_show', {'slug': article.slug}) }}" class="btn btn-primary">Lire la suite</a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucun article publié pour le moment.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -39,6 +39,9 @@ class Comment
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     private Collection $reponses;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $vu = false;
+
     public function __construct()
     {
         $this->reponses = new ArrayCollection();
@@ -161,5 +164,26 @@ class Comment
     public function isReply(): bool
     {
         return $this->parent !== null;
+    }
+
+    public function isVu(): bool
+    {
+        return $this->vu;
+    }
+
+    public function setVu(bool $vu): self
+    {
+        $this->vu = $vu;
+        return $this;
+    }
+
+    public function hasUnreadReplies(): bool
+    {
+        foreach ($this->reponses as $reponse) {
+            if (!$reponse->isVu()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

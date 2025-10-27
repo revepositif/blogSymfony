@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.titre }}{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                {% if article.image %}
+                    <img src="{{ asset('uploads/articles/' ~ article.image) }}" class="card-img-top" alt="Image de l'article">
+                {% endif %}
+                
+                <div class="card-body">
+                    <h1 class="card-title h2 mb-4">{{ article.titre }}</h1>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i> Par {{ article.auteur }}
+                            <i class="fas fa-calendar ms-3 me-1"></i> 
+                            {% if article.isPublished %}
+                                Publié le {{ article.datePublication|date('d/m/Y') }}
+                            {% else %}
+                                Brouillon créé le {{ article.dateCreation|date('d/m/Y') }}
+                            {% endif %}
+                        </small>
+                    </div>
+
+                    {% if article.categories|length > 0 %}
+                        <div class="mb-3">
+                            {% for category in article.categories %}
+                                <span class="badge bg-secondary me-1">{{ category.nom }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    {% if article.isArchived %}
+                        <div class="alert alert-warning mb-4">
+                            <i class="fas fa-archive me-2"></i> Cet article est archivé
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-text mt-4">
+                        {{ article.contenu|raw }}
+                    </div>
+                </div>
+
+                {# Les boutons de gestion ne s'affichent que dans la section "Mes articles" #}
+                {% if app.request.attributes.get('_route') starts with 'app_article_my_' and is_granted('ROLE_USER') and article.auteur == app.user %}
+                    <div class="card-footer bg-light">
+                        <div class="btn-group">
+                            {% if article.isDraft %}
+                                <a href="{{ path('app_article_publish', {'id': article.id}) }}" class="btn btn-success btn-sm">
+                                    <i class="bi bi-paper-plane me-1"></i> Publier
+                                </a>
+                            {% endif %}
+                            
+                            {% if not article.isArchived %}
+                                <a href="{{ path('app_article_archive', {'id': article.id}) }}" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-archive me-1"></i> Archiver
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_article_restore', {'id': article.id}) }}" class="btn btn-info btn-sm">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurer
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-4">
+                {% if app.request.headers.get('referer') matches '/mes-articles/' or (is_granted('ROLE_USER') and article.auteur == app.user) %}
+                    <a href="{{ path('app_article_my_articles') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Retour à mes articles
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_articles_publies') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-1"></i> Retour aux articles
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{# templates/article/_comment.html.twig #}
+{% macro comment_block(comment, replyForm, level = 0) %}
+    <div class="comment mb-3 ps-{{ level * 4 }}">
+        <div class="card {% if comment.parent %}border-start border-info{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                        {% if comment.parent %}
+                            <i class="bi bi-arrow-return-right me-2 text-muted"></i>
+                        {% endif %}
+                        <strong class="{% if comment.auteur == app.user %}text-primary{% endif %}">
+                            {{ comment.auteur.email }}
+                            {% if comment.auteur == app.user %}
+                                <small>(vous)</small>
+                            {% endif %}
+                        </strong>
+                        <small class="text-muted ms-2">
+                            {{ comment.dateCreation|date('d/m/Y H:i') }}
+                        </small>
+                        {% if app.user and comment.parent and comment.parent.auteur == app.user %}
+                            {% if not notifications[comment.id].isRead|default(true) %}
+                                <span class="badge bg-primary ms-2">Nouvelle réponse</span>
+                                <a href="{{ path('app_comment_mark_as_read', {'id': comment.id}) }}" 
+                                   class="btn btn-link btn-sm p-0 ms-2">
+                                    Marquer comme lu
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <p class="card-text">{{ comment.contenu }}</p>
+                
+                {% if app.user and comment.auteur != app.user %}
+                    <form action="{{ path('app_comment_reply', {'id': comment.id}) }}" method="post" class="mt-2">
+                        <button type="button" class="btn btn-link btn-sm p-0" 
+                                onclick="toggleReplyForm('reply-form-{{ comment.id }}')">
+                            <i class="bi bi-reply"></i> Répondre
+                        </button>
+                        
+                        <div id="reply-form-{{ comment.id }}" class="reply-form mt-3" style="display: none;">
+                            <textarea name="contenu" class="form-control" rows="3" 
+                                      placeholder="Écrivez votre réponse..."></textarea>
+                            <button type="submit" class="btn btn-primary btn-sm mt-2">
+                                Répondre
+                            </button>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        {# Afficher les réponses récursivement avec un niveau supplémentaire #}
+        {% for reponse in comment.reponses %}
+            {{ _self.comment_block(reponse, replyForm, level + 1) }}
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+    {% if app.user %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Ajouter un commentaire</h5>
+            <form action="{{ path('app_article_comment', {'slug': article.slug}) }}" method="post">
+                <div class="form-group">
+                    <textarea name="contenu" class="form-control" rows="4" 
+                              placeholder="Écrivez votre commentaire ici..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">
+                    Publier le commentaire
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}<div class="comments-section">
+    <h4 class="mb-3">Commentaires ({{ comments|length }})</h4>
+    {% from _self import comment_block %}
+    {% for comment in comments %}
+        {% if not comment.parent %}
+            {{ _self.comment_block(comment, commentForm) }}
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+function toggleReplyForm(formId) {
+    const form = document.getElementById(formId);
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+</script>

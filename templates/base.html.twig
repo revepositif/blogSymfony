@@ -121,8 +121,32 @@
                                 <i class="bi bi-house"></i> Accueil
                             </a>
                         </li>
-                        {# Les autres liens seront ajoutés au fur et à mesure #}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_articles_publies') }}">
+                                <i class="bi bi-journal-text"></i> Articles
+                            </a>
+                        </li>
+                        {% if is_granted('ROLE_USER') %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_article_new') }}">
+                                    <i class="bi bi-pencil-square"></i> Écrire un article
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
+                    
+                    <form class="d-flex me-3" action="{{ path('app_search') }}" method="get">
+                        <div class="input-group">
+                            <input type="search" 
+                                   name="q" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Rechercher..."
+                                   aria-label="Rechercher">
+                            <button class="btn btn-outline-light btn-sm" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
                     
                     <ul class="navbar-nav">
                         {% if app.user %}
@@ -142,6 +166,25 @@
                                     <li>
                                         <a class="dropdown-item" href="{{ path('app_profile') }}">
                                             <i class="bi bi-person"></i> Mon profil
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('app_article_my_articles') }}">
+                                            <i class="bi bi-journal-album"></i> Mes articles
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('app_profile_statistics') }}">
+                                            <i class="bi bi-graph-up"></i> Statistiques
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="{{ path('app_notifications') }}">
+                                            <i class="bi bi-bell"></i> Notifications
+                                            {% set unread = notifications_unread|default(0) %}
+                                            {% if unread > 0 %}
+                                                <span class="badge bg-danger rounded-pill">{{ unread }}</span>
+                                            {% endif %}
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>

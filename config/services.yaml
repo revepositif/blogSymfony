@@ -6,6 +6,7 @@
 parameters:
     google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     avatars_directory: '%kernel.project_dir%/public/uploads/avatars'
+    articles_directory: '%kernel.project_dir%/public/uploads/articles'
 
 services:
     # default configuration for services in *this* file
@@ -24,3 +25,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    
+    App\Service\ImageUploader:
+        arguments:
+            $targetDirectory: '%articles_directory%'

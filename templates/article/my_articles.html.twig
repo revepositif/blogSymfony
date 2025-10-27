@@ -1,0 +1,69 @@
+{# templates/article/my_articles.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Articles{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Mes Articles</h1>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Brouillons</h5>
+                    <p class="card-text">{{ stats.drafts }} article(s)</p>
+                    <ul class="list-group">
+                        {% for article in drafts %}
+                            <li class="list-group-item">
+                                <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
+                                <small class="text-muted d-block">Créé le {{ article.dateCreation|date('d/m/Y') }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Articles Publiés</h5>
+                    <p class="card-text">{{ stats.published }} article(s)</p>
+                    <ul class="list-group">
+                        {% for article in published %}
+                            <li class="list-group-item">
+                                <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
+                                <small class="text-muted d-block">Publié le {{ article.datePublication|date('d/m/Y') }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Archives</h5>
+                    <p class="card-text">{{ stats.archived }} article(s)</p>
+                    <ul class="list-group">
+                        {% for article in archived %}
+                            <li class="list-group-item">
+                                <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
+                                <small class="text-muted d-block">Archivé</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ path('app_article_new') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nouvel Article
+        </a>
+    </div>
+</div>
+{% endblock %}

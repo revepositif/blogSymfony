@@ -11,6 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 class Article
 {
+    public const STATUS_DRAFT = 'brouillon';
+    public const STATUS_PUBLISHED = 'publie';
+    public const STATUS_ARCHIVED = 'archive';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -21,6 +25,7 @@ class Article
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
+
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $contenu = null;
@@ -44,8 +49,9 @@ class Article
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comments;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'articles')]
-    private Collection $categories;
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'articles')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Category $category = null;
 
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleLike::class)]
     private Collection $likes;
@@ -53,7 +59,6 @@ class Article
     public function __construct()
     {
         $this->comments = new ArrayCollection();
-        $this->categories = new ArrayCollection();
         $this->likes = new ArrayCollection();
         $this->date_creation = new \DateTimeImmutable();
         $this->statut = 'brouillon';
@@ -87,6 +92,8 @@ class Article
 
         return $this;
     }
+
+
 
     public function getContenu(): ?string
     {
@@ -190,29 +197,14 @@ class Article
         return $this;
     }
 
-    /**
-     * @return Collection<int, Category>
-     */
-    public function getCategories(): Collection
+    public function getCategory(): ?Category
     {
-        return $this->categories;
+        return $this->category;
     }
 
-    public function addCategory(Category $category): static
+    public function setCategory(?Category $category): static
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
-            $category->addArticle($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(Category $category): static
-    {
-        if ($this->categories->removeElement($category)) {
-            $category->removeArticle($this);
-        }
+        $this->category = $category;
 
         return $this;
     }
@@ -255,6 +247,16 @@ class Article
     public function isPublished(): bool
     {
         return $this->statut === 'publie' && $this->date_publication !== null;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->statut === 'archive';
+    }
+
+    public function isDraft(): bool
+    {
+        return $this->statut === 'brouillon';
     }
 
     public function __toString(): string

@@ -19,13 +19,13 @@ class Category
     #[ORM\Column(length: 100)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 100, unique: true)]
+    #[ORM\Column(length: 100, unique: true, nullable: true)]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\ManyToMany(targetEntity: Article::class, mappedBy: 'categories')]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Article::class)]
     private Collection $articles;
 
     public function __construct()
@@ -55,7 +55,7 @@ class Category
         return $this->slug;
     }
 
-    public function setSlug(string $slug): static
+    public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
 
@@ -86,7 +86,7 @@ class Category
     {
         if (!$this->articles->contains($article)) {
             $this->articles->add($article);
-            $article->addCategory($this);
+            $article->setCategory($this);
         }
 
         return $this;
@@ -95,7 +95,9 @@ class Category
     public function removeArticle(Article $article): static
     {
         if ($this->articles->removeElement($article)) {
-            $article->removeCategory($this);
+            if ($article->getCategory() === $this) {
+                $article->setCategory(null);
+            }
         }
 
         return $this;

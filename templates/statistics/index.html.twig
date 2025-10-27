@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques détaillées{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Statistiques détaillées</h1>
+            
+            {# Vue d'ensemble #}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Vue d'ensemble</h5>
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-primary">{{ totalArticles }}</h2>
+                                <p class="text-muted mb-0">Articles publiés</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-primary">{{ totalLikes }}</h2>
+                                <p class="text-muted mb-0">J'aime reçus</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-primary">{{ totalComments }}</h2>
+                                <p class="text-muted mb-0">Commentaires reçus</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-primary">{{ userComments|length }}</h2>
+                                <p class="text-muted mb-0">Commentaires écrits</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Statistiques par article #}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Statistiques par article</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Article</th>
+                                    <th class="text-center">J'aime</th>
+                                    <th class="text-center">Commentaires</th>
+                                    <th>Date de publication</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in articleStats %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('app_article_show', {'slug': stat.slug}) }}">
+                                                {{ stat.titre }}
+                                            </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary">{{ stat.likes }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary">{{ stat.comments }}</span>
+                                        </td>
+                                        <td>
+                                            {% if stat.datePublication %}
+                                                {{ stat.datePublication|date('d/m/Y') }}
+                                            {% else %}
+                                                <span class="text-muted">Non publié</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if stat.statut == 'publie' %}
+                                                <span class="badge bg-success">Publié</span>
+                                            {% elseif stat.statut == 'brouillon' %}
+                                                <span class="badge bg-warning">Brouillon</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Archivé</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Activité récente #}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Vos derniers commentaires</h5>
+                    <div class="list-group">
+                        {% for comment in userComments|slice(0, 5) %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Sur l'article: 
+                                            <a href="{{ path('app_article_show', {'slug': comment.article.slug}) }}">
+                                                {{ comment.article.titre }}
+                                            </a>
+                                        </h6>
+                                        <p class="mb-1">{{ comment.contenu }}</p>
+                                        <small class="text-muted">
+                                            {{ comment.dateCreation|date('d/m/Y H:i') }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="text-center text-muted p-3">
+                                Vous n'avez pas encore écrit de commentaires.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

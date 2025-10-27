@@ -21,15 +21,16 @@ class CommentRepository extends ServiceEntityRepository
     /**
      * Trouve les commentaires approuvés d'un article
      */
-    public function findApprovedCommentsByArticle(Article $article): array
+    public function findAllCommentsByArticle(Article $article): array
     {
         return $this->createQueryBuilder('c')
+            ->select('c', 'r', 'a')
+            ->leftJoin('c.reponses', 'r')
+            ->leftJoin('c.auteur', 'a')
             ->andWhere('c.article = :article')
-            ->andWhere('c.statut = :statut')
-            ->andWhere('c.parent IS NULL') // seulement les commentaires principaux
             ->setParameter('article', $article)
-            ->setParameter('statut', 'approuve')
-            ->orderBy('c.date_creation', 'DESC')
+            ->orderBy('c.date_creation', 'ASC')
+            ->addOrderBy('r.date_creation', 'ASC')
             ->getQuery()
             ->getResult();
     }

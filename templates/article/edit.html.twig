@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'article{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="h2 mb-4">Modifier l'article</h1>
+
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.titre, 'Titre de l\'article', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.titre) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.contenu, 'Contenu de l\'article', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.contenu) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.category, 'Catégorie', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.category, {'attr': {'class': 'form-select'}}) }}
+                        {{ form_errors(form.category) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.nouvelle_categorie, 'Ou créer une nouvelle catégorie', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nouvelle_categorie, {'attr': {'class': 'form-control', 'placeholder': 'Nom de la nouvelle catégorie (optionnel)'}}) }}
+                        {{ form_errors(form.nouvelle_categorie) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.image, 'Image de l\'article', {'label_attr': {'class': 'form-label'}}) }}
+                        {% if article.image %}
+                            <div class="mb-2">
+                                <img src="{{ asset('uploads/articles/' ~ article.image) }}" alt="Image actuelle" class="img-thumbnail" style="max-height: 200px">
+                                <p class="text-muted small">Image actuelle</p>
+                            </div>
+                        {% endif %}
+                        {{ form_widget(form.image, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.image) }}
+                        <small class="text-muted">Laissez vide pour conserver l'image actuelle</small>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('app_article_show', {'slug': article.slug}) }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à l'article
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuration de CKEditor
+    if (typeof CKEDITOR !== 'undefined') {
+        CKEDITOR.replace('article_contenu', {
+            height: 400,
+            removePlugins: 'elementspath,resize',
+            toolbarGroups: [
+                { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+                { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+                { name: 'links' },
+                { name: 'insert' },
+                { name: 'forms' },
+                { name: 'tools' },
+                { name: 'document',    groups: [ 'mode', 'document', 'doctools' ] },
+                { name: 'others' },
+                '/',
+                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+                { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+                { name: 'styles' },
+                { name: 'colors' }
+            ]
+        });
+    }
+});
+</script>
+{% endblock %}

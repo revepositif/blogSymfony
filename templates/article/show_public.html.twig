@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.titre }}{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                {% if article.image %}
+                    <img src="{{ asset('uploads/articles/' ~ article.image) }}" class="card-img-top" alt="Image de l'article">
+                {% endif %}
+                
+                <div class="card-body">
+                    <h1 class="card-title h2 mb-4">{{ article.titre }}</h1>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-person me-1"></i> Par {{ article.auteur }}
+                            <i class="bi bi-calendar ms-3 me-1"></i> 
+                            Publié le {{ article.datePublication|date('d/m/Y') }}
+                        </small>
+                    </div>
+
+                    {% if article.category %}
+                        <div class="mb-3">
+                            <span class="badge bg-secondary me-1">{{ article.category.nom }}</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-text mt-4">
+                        {{ article.contenu|raw }}
+                    </div>
+
+                    <div class="mt-4 border-top pt-3">
+                        <div class="d-flex align-items-center">
+                            {% if app.user %}
+                                <form action="{{ path('app_article_like', {'slug': article.slug}) }}" method="post" class="me-3">
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-heart{% if article.likes|length > 0 %}-fill{% endif %}"></i>
+                                        J'aime ({{ article.likes|length }})
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted me-3">
+                                    <i class="bi bi-heart"></i> {{ article.likes|length }} likes
+                                </span>
+                            {% endif %}
+                            
+                            <button type="button" class="btn btn-link text-decoration-none text-muted p-0" 
+                                    onclick="toggleComments()" id="comments-toggle">
+                                <i class="bi bi-chat me-1"></i>
+                                <span id="comments-count">{{ article.comments|length }}</span> commentaires
+                                <i class="bi bi-chevron-down ms-1" id="comments-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Section des commentaires #}
+            <div class="mt-4" id="comments-section" style="display: none;">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="comments-list">
+                            {% include 'article/_comments.html.twig' with {
+                                'comments': article.comments,
+                                'commentForm': commentForm|default(null)
+                            } %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+            .new-comment-form {
+                border-bottom: 1px solid #dee2e6;
+                padding-bottom: 1.5rem;
+            }
+            #comments-toggle {
+                transition: all 0.3s ease;
+            }
+            #comments-toggle:hover {
+                color: #0d6efd !important;
+            }
+            #comments-icon {
+                transition: transform 0.3s ease;
+            }
+            .rotate-icon {
+                transform: rotate(180deg);
+            }
+            </style>
+
+            <script>
+            function toggleComments() {
+                const section = document.getElementById('comments-section');
+                const icon = document.getElementById('comments-icon');
+                const isHidden = section.style.display === 'none';
+                
+                section.style.display = isHidden ? 'block' : 'none';
+                if (isHidden) {
+                    icon.classList.add('rotate-icon');
+                    // Scroll jusqu'aux commentaires avec une animation douce
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    icon.classList.remove('rotate-icon');
+                }
+            }
+
+            // Si l'URL contient #comments, afficher les commentaires
+            if (window.location.hash === '#comments') {
+                toggleComments();
+            }
+            </script>
+
+            <div class="mt-4">
+                <a href="{{ path('app_articles_publies') }}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour aux articles
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,18 +2,17 @@
 
 namespace App\Controller;
 
+use App\Repository\ArticleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\ArticleRepository;
 
-class HomeController extends AbstractController
+class ArticlesPubliesController extends AbstractController
 {
-    #[Route('/', name: 'app_home')]
+    #[Route('/articles', name: 'app_articles_publies')]
     public function index(ArticleRepository $articleRepository): Response
     {
-        return $this->render('home/index.html.twig', [
-            'title' => 'Bienvenue sur Mon Blog',
+        return $this->render('articles_publies/index.html.twig', [
             'articles' => $articleRepository->findPublishedArticles(),
         ]);
     }

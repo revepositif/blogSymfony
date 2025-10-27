@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="mb-4">
+                {% if query %}
+                    Résultats pour "{{ query }}"
+                {% else %}
+                    Rechercher un article
+                {% endif %}
+            </h1>
+
+            {% if query %}
+                {# Résultats de la recherche #}
+                <div class="mb-3">
+                    <small class="text-muted">
+                        {{ count }} résultat{% if count != 1 %}s{% endif %} trouvé{% if count != 1 %}s{% endif %}
+                    </small>
+                </div>
+
+                {% if articles|length > 0 %}
+                    <div class="articles-list">
+                        {% for article in articles %}
+                            <div class="card shadow-sm mb-4">
+                                {% if article.image %}
+                                    <img src="{{ asset('uploads/articles/' ~ article.image) }}" 
+                                         class="card-img-top" 
+                                         alt="Image de l'article"
+                                         style="height: 200px; object-fit: cover;">
+                                {% endif %}
+                                
+                                <div class="card-body">
+                                    <h2 class="card-title h4">
+                                        <a href="{{ path('app_article_show', {'slug': article.slug}) }}" 
+                                           class="text-decoration-none">
+                                            {{ article.titre }}
+                                        </a>
+                                    </h2>
+                                    
+                                    <p class="card-text text-muted small mb-2">
+                                        <i class="bi bi-person me-1"></i> Par {{ article.auteur }}
+                                        <i class="bi bi-calendar ms-3 me-1"></i> 
+                                        Le {{ article.datePublication|date('d/m/Y') }}
+                                    </p>
+
+                                    {% if article.category %}
+                                        <div class="mb-2">
+                                            <span class="badge bg-secondary">{{ article.category.nom }}</span>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <p class="card-text">
+                                        {{ article.contenu|striptags|slice(0, 200) }}...
+                                    </p>
+                                    
+                                    <div class="d-flex align-items-center mt-3">
+                                        <small class="text-muted me-3">
+                                            <i class="bi bi-heart"></i> {{ article.likes|length }}
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="bi bi-chat"></i> {{ article.comments|length }}
+                                        </small>
+                                        <a href="{{ path('app_article_show', {'slug': article.slug}) }}" 
+                                           class="btn btn-outline-primary btn-sm ms-auto">
+                                            Lire la suite
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-search display-1 text-muted"></i>
+                        <p class="mt-3">Aucun article trouvé pour "{{ query }}"</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

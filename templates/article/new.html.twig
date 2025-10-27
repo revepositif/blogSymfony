@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% if article.id %}Modifier l'article{% else %}Nouvel article{% endif %}{% endblock %}
+
+{% block body %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-body bg-light">
+                    <h1 class="h3 mb-4 text-center">{% if article.id %}Modifier l'article{% else %}Nouvel article{% endif %}</h1>
+
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="mb-4">
+                        {{ form_label(form.titre, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.titre) }}
+                        {{ form_errors(form.titre) }}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(form.nouvelle_categorie, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.nouvelle_categorie) }}
+                        {{ form_errors(form.nouvelle_categorie) }}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(form.contenu, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {{ form_widget(form.contenu) }}
+                        {{ form_errors(form.contenu) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="card border-light">
+                            <div class="card-body bg-white">
+                                <h5 class="card-title mb-3">Image de couverture</h5>
+                                {{ form_widget(form.image) }}
+                                <small class="text-muted d-block mt-2">Formats acceptés : JPG, PNG ou WEBP (max. 5Mo)</small>
+                                {{ form_errors(form.image) }}
+                                {% if article.image %}
+                                    <div class="mt-3">
+                                        <img src="{{ asset('uploads/articles/' ~ article.image) }}" alt="Image actuelle" class="img-thumbnail" style="max-height: 200px">
+                                        <p class="text-muted small mt-2">Image actuelle</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_widget(form.statut) }}
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" name="publish">
+                            <i class="fas fa-paper-plane me-1"></i> Publier
+                        </button>
+                        <button type="submit" class="btn btn-secondary" name="draft">
+                            <i class="fas fa-save me-1"></i> Enregistrer comme brouillon
+                        </button>
+                        {% if article.id and not article.isArchived %}
+                            <button type="submit" class="btn btn-warning" name="archive" formaction="{{ path('app_article_archive', {'id': article.id}) }}">
+                                <i class="fas fa-archive me-1"></i> Archiver
+                            </button>
+                        {% endif %}
+                        <a href="{{ path('app_article_my_articles') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i> Annuler
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Active la validation des formulaires Bootstrap
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Gestion des champs de catégorie
+    const categorySelect = document.querySelector('[data-categories-select]');
+    const newCategoryInput = document.querySelector('[data-new-category]');
+
+    if (categorySelect && newCategoryInput) {
+        categorySelect.addEventListener('change', function() {
+            if (this.value) {
+                newCategoryInput.value = '';
+                newCategoryInput.setAttribute('disabled', 'disabled');
+            } else {
+                newCategoryInput.removeAttribute('disabled');
+            }
+        });
+
+        newCategoryInput.addEventListener('input', function() {
+            if (this.value) {
+                categorySelect.value = '';
+                categorySelect.setAttribute('disabled', 'disabled');
+            } else {
+                categorySelect.removeAttribute('disabled');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

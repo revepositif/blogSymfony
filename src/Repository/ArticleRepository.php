@@ -12,9 +12,46 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ArticleRepository extends ServiceEntityRepository
 {
+    public const STATUS_DRAFT = 'brouillon';
+    public const STATUS_PUBLISHED = 'publie';
+    public const STATUS_ARCHIVED = 'archive';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Article::class);
+    }
+
+    /**
+     * Récupère tous les articles d'un utilisateur selon leur statut
+     */
+    public function findByUserAndStatus(User $user, string $status): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.auteur = :user')
+            ->andWhere('a.statut = :status')
+            ->setParameter('user', $user)
+            ->setParameter('status', $status)
+            ->orderBy('a.date_creation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Récupère les articles publiés avec pagination
+     */
+    public function findPublishedArticles(int $page = 1, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.statut = :status')
+            ->andWhere('a.date_publication IS NOT NULL')
+            ->andWhere('a.date_publication <= :now')
+            ->setParameter('status', self::STATUS_PUBLISHED)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('a.date_publication', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -30,139 +67,35 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les articles publiés avec pagination
+     * Compte le nombre d'articles par statut pour un utilisateur
      */
-    public function findPublishedArticles(int $page = 1, int $limit = 10): array
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.statut = :statut')
-            ->andWhere('a.date_publication IS NOT NULL')
-            ->andWhere('a.date_publication <= :now')
-            ->setParameter('statut', 'publie')
-            ->setParameter('now', new \DateTimeImmutable())
-            ->orderBy('a.date_publication', 'DESC')
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Trouve les articles d'un auteur spécifique
-     */
-    public function findByAuthor(User $user, bool $publishedOnly = false): array
-    {
-        $qb = $this->createQueryBuilder('a')
-            ->andWhere('a.auteur = :user')
-            ->setParameter('user', $user)
-            ->orderBy('a.date_creation', 'DESC');
-
-        if ($publishedOnly) {
-            $qb->andWhere('a.statut = :statut')
-               ->andWhere('a.date_publication IS NOT NULL')
-               ->andWhere('a.date_publication <= :now')
-               ->setParameter('statut', 'publie')
-               ->setParameter('now', new \DateTimeImmutable());
-        }
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * Trouve les articles par catégorie
-     */
-    public function findByCategory(string $categorySlug): array
-    {
-        return $this->createQueryBuilder('a')
-            ->join('a.categories', 'c')
-            ->andWhere('c.slug = :slug')
-            ->andWhere('a.statut = :statut')
-            ->andWhere('a.date_publication IS NOT NULL')
-            ->andWhere('a.date_publication <= :now')
-            ->setParameter('slug', $categorySlug)
-            ->setParameter('statut', 'publie')
-            ->setParameter('now', new \DateTimeImmutable())
-            ->orderBy('a.date_publication', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Trouve les articles les plus populaires (par likes)
-     */
-    public function findMostPopularArticles(int $limit = 5): array
-    {
-        return $this->createQueryBuilder('a')
-            ->select('a', 'COUNT(l.id) as likeCount')
-            ->leftJoin('a.likes', 'l')
-            ->andWhere('a.statut = :statut')
-            ->andWhere('a.date_publication IS NOT NULL')
-            ->andWhere('a.date_publication <= :now')
-            ->setParameter('statut', 'publie')
-            ->setParameter('now', new \DateTimeImmutable())
-            ->groupBy('a.id')
-            ->orderBy('likeCount', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Recherche d'articles par mot-clé
-     */
-    public function search(string $query): array
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.titre LIKE :query OR a.contenu LIKE :query')
-            ->andWhere('a.statut = :statut')
-            ->andWhere('a.date_publication IS NOT NULL')
-            ->andWhere('a.date_publication <= :now')
-            ->setParameter('query', '%' . $query . '%')
-            ->setParameter('statut', 'publie')
-            ->setParameter('now', new \DateTimeImmutable())
-            ->orderBy('a.date_publication', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
-     * Compte le nombre total d'articles publiés
-     */
-    public function countPublishedArticles(): int
+    public function countByUserAndStatus(User $user, string $status): int
     {
         return $this->createQueryBuilder('a')
             ->select('COUNT(a.id)')
-            ->andWhere('a.statut = :statut')
-            ->andWhere('a.date_publication IS NOT NULL')
-            ->andWhere('a.date_publication <= :now')
-            ->setParameter('statut', 'publie')
-            ->setParameter('now', new \DateTimeImmutable())
+            ->andWhere('a.auteur = :user')
+            ->andWhere('a.statut = :status')
+            ->setParameter('user', $user)
+            ->setParameter('status', $status)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    //    /**
-    //     * @return Article[] Returns an array of Article objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Article
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Recherche des articles publiés selon un terme de recherche
+     */
+    public function search(string $query): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.statut = :status')
+            ->andWhere('a.date_publication IS NOT NULL')
+            ->andWhere('a.date_publication <= :now')
+            ->andWhere('LOWER(a.titre) LIKE LOWER(:query) OR LOWER(a.contenu) LIKE LOWER(:query)')
+            ->setParameter('status', self::STATUS_PUBLISHED)
+            ->setParameter('now', new \DateTimeImmutable())
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('a.date_publication', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
