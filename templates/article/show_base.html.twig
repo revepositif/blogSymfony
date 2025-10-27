@@ -21,7 +21,7 @@
                             {% if article.isPublished %}
                                 Publié le {{ article.datePublication|date('d/m/Y') }}
                             {% else %}
-                                Brouillon créé le {{ article.dateCreation|date('d/m/Y') }}
+                                Brouillon créé le {{ article.date_creation|date('d/m/Y') }}
                             {% endif %}
                         </small>
                     </div>

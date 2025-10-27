@@ -21,7 +21,7 @@ class CommentNotificationRepository extends ServiceEntityRepository
             ->andWhere('n.isRead = :isRead')
             ->setParameter('user', $user)
             ->setParameter('isRead', false)
-            ->orderBy('n.dateCreation', 'DESC')
+            ->orderBy('n.date_creation', 'DESC')
             ->getQuery()
             ->getResult();
     }

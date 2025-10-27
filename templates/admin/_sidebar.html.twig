@@ -1,0 +1,56 @@
+{% set current_route = app.request.get('_route') %}
+
+<div class="sidebar bg-dark text-white vh-100 position-fixed top-0 start-0" style="width: 250px; z-index: 1000;">
+    <div class="d-flex flex-column h-100">
+        <div class="p-3">
+            <h5 class="sidebar-heading text-uppercase text-muted">Administration</h5>
+        </div>
+
+        <ul class="nav flex-column mb-auto">
+            <li class="nav-item">
+                <a href="{{ path('admin_dashboard') }}" class="nav-link text-white {{ current_route == 'admin_dashboard' ? 'active bg-primary' : '' }}">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    Tableau de bord
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('admin_users') }}" class="nav-link text-white {{ current_route == 'admin_users' ? 'active bg-primary' : '' }}">
+                    <i class="bi bi-people me-2"></i>
+                    Utilisateurs
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('admin_articles') }}" class="nav-link text-white {{ current_route == 'admin_articles' ? 'active bg-primary' : '' }}">
+                    <i class="bi bi-file-text me-2"></i>
+                    Articles
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('admin_comments') }}" class="nav-link text-white {{ current_route == 'admin_comments' ? 'active bg-primary' : '' }}">
+                    <i class="bi bi-chat me-2"></i>
+                    Commentaires
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ path('app_category_index') }}" class="nav-link text-white {{ current_route == 'app_category_index' ? 'active bg-primary' : '' }}">
+                    <i class="bi bi-tags me-2"></i>
+                    Catégories
+                </a>
+            </li>
+        </ul>
+
+        <div class="border-top my-3"></div>
+
+        <div class="dropdown p-3">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{{ asset('images/default-avatar.png') }}" alt="" width="32" height="32" class="rounded-circle me-2">
+                <strong>{{ app.user.email }}</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" href="{{ path('app_profile') }}">Mon profil</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

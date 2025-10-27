@@ -17,7 +17,7 @@
                         {% for article in drafts %}
                             <li class="list-group-item">
                                 <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
-                                <small class="text-muted d-block">Créé le {{ article.dateCreation|date('d/m/Y') }}</small>
+                                <small class="text-muted d-block">Créé le {{ article.date_creation|date('d/m/Y') }}</small>
                             </li>
                         {% endfor %}
                     </ul>

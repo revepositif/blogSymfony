@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration - Articles{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Gestion des articles</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Titre</th>
+                                    <th>Auteur</th>
+                                    <th>Catégorie</th>
+                                    <th>Statut</th>
+                                    <th>Date de publication</th>
+                                    <th>Vues</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ path('app_article_show', {'slug': article.slug}) }}">
+                                                {{ article.titre }}
+                                            </a>
+                                        </td>
+                                        <td>{{ article.auteur.email }}</td>
+                                        <td>{{ article.category.nom }}</td>
+                                        <td>
+                                            {% if article.statut == 'publie' %}
+                                                <span class="badge bg-success">Publié</span>
+                                            {% elseif article.statut == 'brouillon' %}
+                                                <span class="badge bg-warning">Brouillon</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Archivé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if article.datePublication %}
+                                                {{ article.datePublication|date('d/m/Y') }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ article.views|length }}</td>
+                                        <td>
+                                            <form method="post" action="{{ path('admin_article_delete', {'id': article.id}) }}" 
+                                                  style="display: inline-block"
+                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                                <button class="btn btn-sm btn-danger">
+                                                    <i class="bi bi-trash"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

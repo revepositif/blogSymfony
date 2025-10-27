@@ -81,8 +81,8 @@
                                             <span class="badge bg-secondary">{{ stat.comments }}</span>
                                         </td>
                                         <td>
-                                            {% if stat.datePublication %}
-                                                {{ stat.datePublication|date('d/m/Y') }}
+                                            {% if stat.date_publication %}
+                                                {{ stat.date_publication|date('d/m/Y') }}
                                             {% else %}
                                                 <span class="text-muted">Non publié</span>
                                             {% endif %}

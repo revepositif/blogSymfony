@@ -39,7 +39,7 @@ class StatisticsController extends AbstractController
                 'likes' => $likes,
                 'comments' => $comments,
                 'views' => $views,
-                'datePublication' => $article->getDatePublication(),
+                'date_publication' => $article->getDatePublication(),
                 'statut' => $article->getStatut()
             ];
         }

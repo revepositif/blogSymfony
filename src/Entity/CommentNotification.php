@@ -25,11 +25,11 @@ class CommentNotification
     private ?bool $isRead = false;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $dateCreation = null;
+    private ?\DateTimeImmutable $date_creation = null;
 
     public function __construct()
     {
-        $this->dateCreation = new \DateTimeImmutable();
+        $this->date_creation = new \DateTimeImmutable();
         $this->isRead = false;
     }
 
@@ -73,12 +73,12 @@ class CommentNotification
 
     public function getDateCreation(): ?\DateTimeImmutable
     {
-        return $this->dateCreation;
+        return $this->date_creation;
     }
 
-    public function setDateCreation(\DateTimeImmutable $dateCreation): static
+    public function setDateCreation(\DateTimeImmutable $date_creation): static
     {
-        $this->dateCreation = $dateCreation;
+        $this->date_creation = $date_creation;
         return $this;
     }
 }
