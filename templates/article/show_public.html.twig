@@ -6,46 +6,73 @@
 <div class="container my-4">
     <div class="row">
         <div class="col-md-8 mx-auto">
+            {# En-tête de l'article avec image de couverture #}
             <div class="card shadow">
                 {% if article.image %}
-                    <img src="{{ asset('uploads/articles/' ~ article.image) }}" class="card-img-top" alt="Image de l'article">
+                    <div class="article-image-container" style="height: 400px; overflow: hidden;">
+                        <img src="{{ asset('uploads/articles/' ~ article.image) }}" 
+                             class="card-img-top" 
+                             alt="Image de l'article"
+                             style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
                 {% endif %}
                 
                 <div class="card-body">
-                    <h1 class="card-title h2 mb-4">{{ article.titre }}</h1>
-                    
-                    <div class="mb-3">
-                        <small class="text-muted">
-                            <i class="bi bi-person me-1"></i> Par {{ article.auteur }}
-                            <i class="bi bi-calendar ms-3 me-1"></i> 
-                            Publié le {{ article.datePublication|date('d/m/Y') }}
-                        </small>
-                    </div>
-
-                    {% if article.category %}
-                        <div class="mb-3">
-                            <span class="badge bg-secondary me-1">{{ article.category.nom }}</span>
+                    {# En-tête avec titre et métadonnées #}
+                    <div class="article-header mb-4">
+                        <h1 class="card-title h2 mb-3">{{ article.titre }}</h1>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="author-info">
+                                <small class="text-muted">
+                                    <i class="bi bi-person-circle me-1"></i> 
+                                    Par <span class="fw-medium text-dark">{{ article.auteur }}</span>
+                                </small>
+                            </div>
+                            <div class="date-info ms-3">
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i> 
+                                    Publié le <span class="text-dark">{{ article.datePublication|date('d/m/Y') }}</span>
+                                </small>
+                            </div>
                         </div>
-                    {% endif %}
+
+                        {% if article.category %}
+                            <div class="category-info">
+                                <span class="badge bg-primary-subtle text-primary-emphasis">
+                                    <i class="bi bi-bookmark me-1"></i>{{ article.category.nom }}
+                                </span>
+                            </div>
+                        {% endif %}
                     
-                    <div class="card-text mt-4">
-                        {{ article.contenu|raw }}
+                    {# Contenu de l'article #}
+                    <div class="article-content mt-4">
+                        <div class="card-text content-wrapper lh-lg">
+                            {{ article.contenu|raw }}
+                        </div>
                     </div>
 
-                    <div class="mt-4 border-top pt-3">
-                        <div class="d-flex align-items-center">
-                            {% if app.user %}
-                                <form action="{{ path('app_article_like', {'slug': article.slug}) }}" method="post" class="me-3">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-heart{% if article.likes|length > 0 %}-fill{% endif %}"></i>
-                                        J'aime ({{ article.likes|length }})
-                                    </button>
-                                </form>
-                            {% else %}
+                    {# Section d'engagement (likes et commentaires) #}
+                    <div class="engagement-section mt-5 border-top pt-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                {% if app.user %}
+                                    <form action="{{ path('app_article_like', {'slug': article.slug}) }}" method="post" class="me-3">
+                                        <button type="submit" class="btn btn-outline-primary btn-sm px-3">
+                                            <i class="bi bi-heart{% if article.likes|length > 0 %}-fill{% endif %} me-2"></i>
+                                            <span class="fw-medium">{{ article.likes|length }}</span>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-muted me-3">
+                                        <i class="bi bi-heart me-1"></i> {{ article.likes|length }} likes
+                                    </span>
+                                {% endif %}
+                                
+                                {# Affichage du nombre de vues uniques #}
                                 <span class="text-muted me-3">
-                                    <i class="bi bi-heart"></i> {{ article.likes|length }} likes
+                                    <i class="bi bi-eye me-1"></i> {{ article.uniqueViewsCount }} vues
                                 </span>
-                            {% endif %}
                             
                             <button type="button" class="btn btn-link text-decoration-none text-muted p-0" 
                                     onclick="toggleComments()" id="comments-toggle">

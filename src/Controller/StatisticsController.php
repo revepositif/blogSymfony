@@ -21,17 +21,24 @@ class StatisticsController extends AbstractController
         $articles = $articleRepository->findBy(['auteur' => $user]);
         $totalLikes = 0;
         $totalComments = 0;
+        $totalViews = 0;
         $articleStats = [];
         
         foreach ($articles as $article) {
-            $totalLikes += count($article->getLikes());
-            $totalComments += count($article->getComments());
+            $likes = count($article->getLikes());
+            $comments = count($article->getComments());
+            $views = $article->getUniqueViewsCount();
+            
+            $totalLikes += $likes;
+            $totalComments += $comments;
+            $totalViews += $views;
             
             $articleStats[] = [
                 'titre' => $article->getTitre(),
                 'slug' => $article->getSlug(),
-                'likes' => count($article->getLikes()),
-                'comments' => count($article->getComments()),
+                'likes' => $likes,
+                'comments' => $comments,
+                'views' => $views,
                 'datePublication' => $article->getDatePublication(),
                 'statut' => $article->getStatut()
             ];
@@ -45,6 +52,7 @@ class StatisticsController extends AbstractController
             'totalArticles' => count($articles),
             'totalLikes' => $totalLikes,
             'totalComments' => $totalComments,
+            'totalViews' => $totalViews,
             'articleStats' => $articleStats,
             'userComments' => $userComments
         ]);

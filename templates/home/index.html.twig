@@ -5,13 +5,13 @@
 {% block body %}
 <div class="container">
     <div class="text-center mb-5">
-        <h1 class="display-4">{{ title }}</h1>
-        <p class="lead">Découvrez les derniers articles, partagez vos connaissances et échangez avec la communauté.</p>
+        <h1 class="display-4 fw-bold text-primary mb-4">{{ title }}</h1>
+        <p class="lead fw-normal text-dark mb-4" style="font-size: 1.3rem;">Découvrez les derniers articles, partagez vos connaissances et échangez avec la communauté.</p>
         {% if not app.user %}
             <hr class="my-4">
-            <p>Rejoignez-nous dès maintenant pour participer à cette aventure.</p>
-            <a class="btn btn-primary btn-lg" href="{{ path('inscription') }}" role="button">
-                <i class="bi bi-person-plus"></i> S'inscrire
+            <p class="fs-5 text-primary-emphasis" style="font-weight: 500;">Rejoignez-nous dès maintenant pour participer à cette aventure.</p>
+            <a class="btn btn-primary btn-lg" href="{{ path('app_articles_publies') }}" role="button">
+                <i class="bi bi-journal-text"></i> Découvrir les articles
             </a>
         {% endif %}
     </div>
@@ -39,6 +39,7 @@
                             <div class="small text-muted">
                                 <i class="bi bi-heart"></i> {{ article.likes|length }}
                                 <i class="bi bi-chat ms-2"></i> {{ article.comments|length }}
+                                <i class="bi bi-eye ms-2"></i> {{ article.uniqueViewsCount }}
                             </div>
                             <a href="{{ path('app_article_show', {'slug': article.slug}) }}" 
                                class="btn btn-outline-primary btn-sm">

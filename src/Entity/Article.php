@@ -56,10 +56,14 @@ class Article
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleLike::class)]
     private Collection $likes;
 
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleView::class)]
+    private Collection $views;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->likes = new ArrayCollection();
+        $this->views = new ArrayCollection();
         $this->date_creation = new \DateTimeImmutable();
         $this->statut = 'brouillon';
     }
@@ -262,5 +266,39 @@ class Article
     public function __toString(): string
     {
         return $this->titre;
+    }
+
+    /**
+     * @return Collection<int, ArticleView>
+     */
+    public function getViews(): Collection
+    {
+        return $this->views;
+    }
+
+    public function getUniqueViewsCount(): int
+    {
+        return $this->views->count();
+    }
+
+    public function addView(ArticleView $view): static
+    {
+        if (!$this->views->contains($view)) {
+            $this->views->add($view);
+            $view->setArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeView(ArticleView $view): static
+    {
+        if ($this->views->removeElement($view)) {
+            if ($view->getArticle() === $this) {
+                $view->setArticle(null);
+            }
+        }
+
+        return $this;
     }
 }

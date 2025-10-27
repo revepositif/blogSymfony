@@ -13,25 +13,31 @@
                 <div class="card-body">
                     <h5 class="card-title mb-4">Vue d'ensemble</h5>
                     <div class="row text-center">
-                        <div class="col-md-3">
+                        <div class="col">
                             <div class="p-3 border rounded">
                                 <h2 class="text-primary">{{ totalArticles }}</h2>
                                 <p class="text-muted mb-0">Articles publiés</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col">
+                            <div class="p-3 border rounded">
+                                <h2 class="text-primary">{{ totalViews }}</h2>
+                                <p class="text-muted mb-0">Vues totales</p>
+                            </div>
+                        </div>
+                        <div class="col">
                             <div class="p-3 border rounded">
                                 <h2 class="text-primary">{{ totalLikes }}</h2>
                                 <p class="text-muted mb-0">J'aime reçus</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col">
                             <div class="p-3 border rounded">
                                 <h2 class="text-primary">{{ totalComments }}</h2>
                                 <p class="text-muted mb-0">Commentaires reçus</p>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col">
                             <div class="p-3 border rounded">
                                 <h2 class="text-primary">{{ userComments|length }}</h2>
                                 <p class="text-muted mb-0">Commentaires écrits</p>
@@ -50,6 +56,7 @@
                             <thead>
                                 <tr>
                                     <th>Article</th>
+                                    <th class="text-center">Vues</th>
                                     <th class="text-center">J'aime</th>
                                     <th class="text-center">Commentaires</th>
                                     <th>Date de publication</th>
@@ -63,6 +70,9 @@
                                             <a href="{{ path('app_article_show', {'slug': stat.slug}) }}">
                                                 {{ stat.titre }}
                                             </a>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-info">{{ stat.views }}</span>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-primary">{{ stat.likes }}</span>

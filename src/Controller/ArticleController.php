@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\ArticleView;
 use App\Entity\Category;
 use App\Entity\Comment;
+use App\Repository\ArticleViewRepository;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -271,6 +273,24 @@ class ArticleController extends AbstractController
         // Vérifie si l'article est publié ou si l'utilisateur est l'auteur
         if (!$article->isPublished() && !$isAuthor) {
             throw $this->createAccessDeniedException('Vous n\'avez pas accès à cet article.');
+        }
+
+        // Gestion des vues d'article
+        if ($currentUser && !$isAuthor) {  // On ne compte pas les vues de l'auteur
+            /** @var ArticleViewRepository $articleViewRepository */
+            $articleViewRepository = $entityManager->getRepository(\App\Entity\ArticleView::class);
+            
+            // Vérifie si l'utilisateur a déjà vu cet article
+            if (!$articleViewRepository->hasUserViewedArticle($currentUser, $article)) {
+                // Création d'une nouvelle vue
+                $view = new ArticleView();
+                $view->setUser($currentUser);
+                $view->setArticle($article);
+                $view->setViewedAt(new \DateTimeImmutable());
+                
+                $entityManager->persist($view);
+                $entityManager->flush();
+            }
         }
 
         // Récupération des notifications pour les commentaires
