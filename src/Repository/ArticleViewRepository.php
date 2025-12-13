@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Article;
 use App\Entity\ArticleView;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,7 +23,7 @@ class ArticleViewRepository extends ServiceEntityRepository
         parent::__construct($registry, ArticleView::class);
     }
 
-    public function hasUserViewedArticle(\App\Entity\User $user, \App\Entity\Article $article): bool
+    public function hasUserViewedArticle(User $user, Article $article): bool
     {
         $result = $this->findOneBy([
             'user' => $user,
