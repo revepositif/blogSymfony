@@ -63,7 +63,7 @@
                                                       style="display: inline-block">
                                                     <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ comment.id) }}">
                                                     <button class="btn btn-sm btn-warning">
-                                                        <i class="bi bi-x"></i> Rejeter
+                                                        <i class="bi bi-x"></i>
                                                     </button>
                                                 </form>
                                             {% elseif comment.statut == 'rejete' %}

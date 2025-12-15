@@ -45,14 +45,14 @@
                                     <div class="btn-group" role="group">
                                         <a href="{{ path('app_category_edit', {'id': category.id}) }}" 
                                            class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-pencil"></i> Modifier
+                                            <i class="bi bi-pencil"></i>
                                         </a>
                                         <form method="post" action="{{ path('app_category_delete', {'id': category.id}) }}" 
                                               style="display: inline-block"
                                               onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?');">
                                             <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
                                             <button class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i> Supprimer
+                                                <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </div>
