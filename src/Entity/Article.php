@@ -14,6 +14,7 @@ class Article
     public const STATUS_DRAFT = 'brouillon';
     public const STATUS_PUBLISHED = 'publie';
     public const STATUS_ARCHIVED = 'archive';
+    public const STATUS_REJECTED = 'rejete';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

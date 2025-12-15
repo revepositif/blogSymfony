@@ -51,7 +51,9 @@
 
         {# Afficher les réponses récursivement avec un niveau supplémentaire #}
         {% for reponse in comment.reponses %}
-            {{ _self.comment_block(reponse, replyForm, level + 1) }}
+            {% if reponse.statut == 'approuve' %}
+                {{ _self.comment_block(reponse, replyForm, level + 1) }}
+            {% endif %}
         {% endfor %}
     </div>
 {% endmacro %}
@@ -71,15 +73,17 @@
             </form>
         </div>
     </div>
-    {% endif %}<div class="comments-section">
-    <h4 class="mb-3">Commentaires ({{ comments|length }})</h4>
-    {% from _self import comment_block %}
-    {% for comment in comments %}
-        {% if not comment.parent %}
-            {{ _self.comment_block(comment, commentForm) }}
-        {% endif %}
-    {% endfor %}
-</div>
+    {% endif %}
+    
+    <div class="comments-section">
+        <h4 class="mb-3">Commentaires ({{ comments|filter(c => c.statut == 'approuve')|length }})</h4>
+        {% from _self import comment_block %}
+        {% for comment in comments %}
+            {% if not comment.parent and comment.statut == 'approuve' %}
+                {{ _self.comment_block(comment, commentForm) }}
+            {% endif %}
+        {% endfor %}
+    </div>
 
 <script>
 function toggleReplyForm(formId) {

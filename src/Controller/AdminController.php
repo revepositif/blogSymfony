@@ -29,30 +29,23 @@ class AdminController extends AbstractController
         CategoryRepository $categoryRepository
     ): Response
     {
-        // Articles publiés uniquement pour les derniers articles
-        $latestUsers = $userRepository->findBy([], ['date_creation' => 'DESC'], 5);
+        $users = $userRepository->findBy([], ['date_creation' => 'DESC']);
+        $articles = $articleRepository->findBy([], ['date_creation' => 'DESC']);
+        $comments = $commentRepository->findBy([], ['date_creation' => 'DESC']);
+        
         $totalUsers = $userRepository->count([]);
-
-        $latestArticles = $articleRepository->findBy(
-            ['statut' => Article::STATUS_PUBLISHED], 
-            ['date_publication' => 'DESC'], 
-            5
-        );
         $totalArticles = $articleRepository->count(['statut' => Article::STATUS_PUBLISHED]);
-
-        $latestComments = $commentRepository->findBy([], ['date_creation' => 'DESC'], 5);
         $totalComments = $commentRepository->count([]);
-
         $totalCategories = $categoryRepository->count([]);
 
         return $this->render('admin/dashboard.html.twig', [
+            'users' => $users,
+            'articles' => $articles,
+            'comments' => $comments,
             'totalUsers' => $totalUsers,
             'totalArticles' => $totalArticles,
             'totalComments' => $totalComments,
             'totalCategories' => $totalCategories,
-            'latestUsers' => $latestUsers,
-            'latestArticles' => $latestArticles,
-            'latestComments' => $latestComments,
         ]);
     }
 
@@ -168,5 +161,76 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_comments');
+    }
+
+    #[Route('/comment/{id}/approve', name: 'admin_comment_approve', methods: ['POST'])]
+    public function approveComment(
+        Request $request, 
+        Comment $comment, 
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        if ($this->isCsrfTokenValid('approve'.$comment->getId(), $request->request->get('_token'))) {
+            $comment->setStatut('approuve');
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Commentaire approuvé avec succès.');
+        }
+
+        return $this->redirectToRoute('admin_comments');
+    }
+
+    #[Route('/comment/{id}/reject', name: 'admin_comment_reject', methods: ['POST'])]
+    public function rejectComment(
+        Request $request, 
+        Comment $comment, 
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        if ($this->isCsrfTokenValid('reject'.$comment->getId(), $request->request->get('_token'))) {
+            $comment->setStatut('rejete');
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Commentaire rejeté avec succès.');
+        }
+
+        return $this->redirectToRoute('admin_comments');
+    }
+
+    #[Route('/article/{id}/reject', name: 'admin_article_reject', methods: ['POST'])]
+    public function rejectArticle(
+        Request $request, 
+        Article $article, 
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        if ($this->isCsrfTokenValid('reject'.$article->getId(), $request->request->get('_token'))) {
+            $article->setStatut(Article::STATUS_REJECTED);
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Article rejeté avec succès.');
+        }
+
+        return $this->redirectToRoute('admin_articles');
+    }
+
+    #[Route('/article/{id}/approve', name: 'admin_article_approve', methods: ['POST'])]
+    public function approveArticle(
+        Request $request, 
+        Article $article, 
+        EntityManagerInterface $entityManager
+    ): Response
+    {
+        if ($this->isCsrfTokenValid('approve'.$article->getId(), $request->request->get('_token'))) {
+            $article->setStatut(Article::STATUS_PUBLISHED);
+            if (!$article->getDatePublication()) {
+                $article->setDatePublication(new \DateTimeImmutable());
+            }
+            $entityManager->flush();
+            
+            $this->addFlash('success', 'Article réactivé avec succès.');
+        }
+
+        return $this->redirectToRoute('admin_articles');
     }
 }

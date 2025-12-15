@@ -3,6 +3,50 @@
 {% block title %}Administration - Articles{% endblock %}
 
 {% block body %}
+<style>
+    .admin-articles-table .table {
+        font-size: 0.95rem;
+    }
+    
+    .admin-articles-table .table td {
+        vertical-align: middle;
+    }
+    
+    .admin-articles-table .col-titre {
+        max-width: 200px;
+    }
+    
+    .admin-articles-table .col-titre a {
+        white-space: normal;
+        word-break: break-word;
+    }
+    
+    .admin-articles-table .col-auteur {
+        font-size: 0.9rem;
+        max-width: 150px;
+    }
+    
+    .admin-articles-table .col-categorie {
+        max-width: 120px;
+    }
+    
+    .admin-articles-table .col-actions {
+        white-space: nowrap;
+        padding: 0.5rem 0.75rem !important;
+    }
+    
+    .admin-articles-table .actions-container {
+        display: flex;
+        gap: 6px;
+        flex-wrap: nowrap;
+    }
+    
+    .admin-articles-table .btn-sm {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
@@ -16,55 +60,82 @@
 
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table">
+                    <div class="table-responsive admin-articles-table">
+                        <table class="table table-sm">
                             <thead>
                                 <tr>
-                                    <th>Titre</th>
-                                    <th>Auteur</th>
-                                    <th>Catégorie</th>
-                                    <th>Statut</th>
-                                    <th>Date de publication</th>
-                                    <th>Vues</th>
-                                    <th>Actions</th>
+                                    <th style="width: 25%;">Titre</th>
+                                    <th style="width: 18%;">Auteur</th>
+                                    <th style="width: 12%;">Catégorie</th>
+                                    <th style="width: 10%;">Statut</th>
+                                    <th style="width: 12%;">Date</th>
+                                    <th style="width: 8%;">Vues</th>
+                                    <th style="width: 15%;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for article in articles %}
                                     <tr>
-                                        <td>
-                                            <a href="{{ path('app_article_show', {'slug': article.slug}) }}">
-                                                {{ article.titre }}
+                                        <td class="col-titre">
+                                            <a href="{{ path('app_article_show', {'slug': article.slug}) }}" title="{{ article.titre }}">
+                                                {{ article.titre|length > 30 ? article.titre|slice(0, 27) ~ '...' : article.titre }}
                                             </a>
                                         </td>
-                                        <td>{{ article.auteur.email }}</td>
-                                        <td>{{ article.category.nom }}</td>
+                                        <td class="col-auteur">
+                                            <small>{{ article.auteur.email|length > 20 ? article.auteur.email|slice(0, 17) ~ '...' : article.auteur.email }}</small>
+                                        </td>
+                                        <td class="col-categorie">
+                                            <small>{{ article.category.nom }}</small>
+                                        </td>
                                         <td>
                                             {% if article.statut == 'publie' %}
                                                 <span class="badge bg-success">Publié</span>
                                             {% elseif article.statut == 'brouillon' %}
                                                 <span class="badge bg-warning">Brouillon</span>
+                                            {% elseif article.statut == 'rejete' %}
+                                                <span class="badge bg-danger">Rejeté</span>
                                             {% else %}
                                                 <span class="badge bg-secondary">Archivé</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if article.datePublication %}
-                                                {{ article.datePublication|date('d/m/Y') }}
-                                            {% else %}
-                                                -
-                                            {% endif %}
+                                            <small>
+                                                {% if article.datePublication %}
+                                                    {{ article.datePublication|date('d/m/Y') }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </small>
                                         </td>
-                                        <td>{{ article.views|length }}</td>
-                                        <td>
-                                            <form method="post" action="{{ path('admin_article_delete', {'id': article.id}) }}" 
-                                                  style="display: inline-block"
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
-                                                <button class="btn btn-sm btn-danger">
-                                                    <i class="bi bi-trash"></i> Supprimer
-                                                </button>
-                                            </form>
+                                        <td class="text-center">
+                                            <small>{{ article.views|length }}</small>
+                                        </td>
+                                        <td class="col-actions">
+                                            <div class="actions-container">
+                                                {% if article.statut == 'publie' %}
+                                                    <form method="post" action="{{ path('admin_article_reject', {'id': article.id}) }}" style="margin: 0;">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ article.id) }}">
+                                                        <button class="btn btn-sm btn-warning" title="Rejeter">
+                                                            <i class="bi bi-x"></i>
+                                                        </button>
+                                                    </form>
+                                                {% elseif article.statut == 'rejete' %}
+                                                    <form method="post" action="{{ path('admin_article_approve', {'id': article.id}) }}" style="margin: 0;">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ article.id) }}">
+                                                        <button class="btn btn-sm btn-success" title="Réactiver">
+                                                            <i class="bi bi-check"></i>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                <form method="post" action="{{ path('admin_article_delete', {'id': article.id}) }}" 
+                                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');"
+                                                      style="margin: 0;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                                    <button class="btn btn-sm btn-danger" title="Supprimer">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}

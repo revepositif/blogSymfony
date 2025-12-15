@@ -23,6 +23,7 @@
                                     <th>Article</th>
                                     <th>Auteur</th>
                                     <th>Contenu</th>
+                                    <th>Statut</th>
                                     <th>Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -37,8 +38,43 @@
                                         </td>
                                         <td>{{ comment.auteur.email }}</td>
                                         <td>{{ comment.contenu|striptags|slice(0, 100) }}...</td>
+                                        <td>
+                                            {% if comment.statut == 'approuve' %}
+                                                <span class="badge bg-success">Approuvé</span>
+                                            {% elseif comment.statut == 'en_attente' %}
+                                                <span class="badge bg-warning">En attente</span>
+                                            {% elseif comment.statut == 'rejete' %}
+                                                <span class="badge bg-danger">Rejeté</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ comment.statut }}</span>
+                                            {% endif %}
+                                        </td>
                                         <td>{{ comment.dateCreation|date('d/m/Y H:i') }}</td>
                                         <td>
+                                            {% if comment.statut == 'en_attente' %}
+                                                <form method="post" action="{{ path('admin_comment_approve', {'id': comment.id}) }}" 
+                                                      style="display: inline-block">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ comment.id) }}">
+                                                    <button class="btn btn-sm btn-success">
+                                                        <i class="bi bi-check"></i> Approuver
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{{ path('admin_comment_reject', {'id': comment.id}) }}" 
+                                                      style="display: inline-block">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ comment.id) }}">
+                                                    <button class="btn btn-sm btn-warning">
+                                                        <i class="bi bi-x"></i> Rejeter
+                                                    </button>
+                                                </form>
+                                            {% elseif comment.statut == 'rejete' %}
+                                                <form method="post" action="{{ path('admin_comment_approve', {'id': comment.id}) }}" 
+                                                      style="display: inline-block">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ comment.id) }}">
+                                                    <button class="btn btn-sm btn-success">
+                                                        <i class="bi bi-check"></i> Réactiver
+                                                    </button>
+                                                </form>
+                                            {% endif %}
                                             <form method="post" action="{{ path('admin_comment_delete', {'id': comment.id}) }}" 
                                                   style="display: inline-block"
                                                   onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
