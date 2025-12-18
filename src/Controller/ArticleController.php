@@ -172,7 +172,7 @@ class ArticleController extends AbstractController
         return $this->redirectToRoute('app_article_show', ['slug' => $article->getSlug()]);
     }
 
-    #[Route('/{slug}/supprimer', name: 'app_article_delete')]
+    #[Route('/{slug}/supprimer', name: 'app_article_delete', methods: ['POST'])]
     public function delete(Article $article, EntityManagerInterface $entityManager, Request $request): Response
     {
         // Vérifie si l'utilisateur est l'auteur
@@ -193,7 +193,10 @@ class ArticleController extends AbstractController
             }
         }
 
-        $entityManager->remove($article);
+        // Utiliser la méthode removeArticle() de l'User pour supprimer l'article
+        $auteur = $article->getAuteur();
+        $auteur->removeArticle($article);
+        
         $entityManager->flush();
 
         $this->addFlash('success', 'Article supprimé avec succès !');

@@ -1,4 +1,4 @@
-controllers:
+ontrollers:
     resource:
         path: ../src/Controller/
         namespace: App\Controller

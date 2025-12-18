@@ -39,12 +39,16 @@ class Comment
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     private Collection $reponses;
 
+    #[ORM\OneToMany(mappedBy: 'comment', targetEntity: CommentNotification::class, orphanRemoval: true)]
+    private Collection $notifications;
+
     #[ORM\Column(type: 'boolean')]
     private bool $vu = false;
 
     public function __construct()
     {
         $this->reponses = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
         $this->date_creation = new \DateTimeImmutable();
         $this->statut = 'en_attente';
     }
@@ -150,6 +154,35 @@ class Comment
             // set the owning side to null (unless already changed)
             if ($reponse->getParent() === $this) {
                 $reponse->setParent(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommentNotification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(CommentNotification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setComment($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(CommentNotification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            if ($notification->getComment() === $this) {
+                $notification->setComment(null);
             }
         }
 

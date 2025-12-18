@@ -15,9 +15,25 @@
                     <p class="card-text">{{ stats.drafts }} article(s)</p>
                     <ul class="list-group">
                         {% for article in drafts %}
-                            <li class="list-group-item">
-                                <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
-                                <small class="text-muted d-block">Créé le {{ article.date_creation|date('d/m/Y') }}</small>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
+                                    <small class="text-muted d-block">Créé le {{ article.dateCreation|date('d/m/Y') }}</small>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ path('app_article_edit', {'slug': article.slug}) }}" class="btn btn-outline-primary" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ path('app_article_publish', {'slug': article.slug}) }}" class="btn btn-outline-success" title="Publier">
+                                        <i class="bi bi-paper-plane"></i>
+                                    </a>
+                                    <form action="{{ path('app_article_delete', {'slug': article.slug}) }}" method="post" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>
@@ -32,9 +48,25 @@
                     <p class="card-text">{{ stats.published }} article(s)</p>
                     <ul class="list-group">
                         {% for article in published %}
-                            <li class="list-group-item">
-                                <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
-                                <small class="text-muted d-block">Publié le {{ article.datePublication|date('d/m/Y') }}</small>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
+                                    <small class="text-muted d-block">Publié le {{ article.datePublication|date('d/m/Y') }}</small>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ path('app_article_edit', {'slug': article.slug}) }}" class="btn btn-outline-primary" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ path('app_article_archive', {'slug': article.slug}) }}" class="btn btn-outline-warning" title="Archiver">
+                                        <i class="bi bi-archive"></i>
+                                    </a>
+                                    <form action="{{ path('app_article_delete', {'slug': article.slug}) }}" method="post" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>
@@ -49,9 +81,22 @@
                     <p class="card-text">{{ stats.archived }} article(s)</p>
                     <ul class="list-group">
                         {% for article in archived %}
-                            <li class="list-group-item">
-                                <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
-                                <small class="text-muted d-block">Archivé</small>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{{ path('app_article_show', {'slug': article.slug, 'from': 'my-articles'}) }}">{{ article.titre }}</a>
+                                    <small class="text-muted d-block">Archivé</small>
+                                </div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ path('app_article_restore', {'slug': article.slug}) }}" class="btn btn-outline-info" title="Restaurer">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                    </a>
+                                    <form action="{{ path('app_article_delete', {'slug': article.slug}) }}" method="post" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>
